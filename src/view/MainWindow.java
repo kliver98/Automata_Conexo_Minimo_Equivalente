@@ -52,8 +52,10 @@ public class MainWindow extends JFrame {
 	
 	//Methods
 	public MainWindow() {
-		setup();
-		init();
+		model = new Automata(true);	//Prueba
+		model.chargeTest();			//Prueba
+//		setup();
+//		init();
 	}
 	
 	private void addPanels() {
