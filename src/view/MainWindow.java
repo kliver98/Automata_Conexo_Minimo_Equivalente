@@ -11,7 +11,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import model.Automata;
-
+/**
+ * 
+ * @author Kliver Daniel Giron
+ *
+ */
 public class MainWindow extends JFrame {
 
 	/**
@@ -60,7 +64,7 @@ public class MainWindow extends JFrame {
 	
 	private void addPanels(String[][] data) {
 		pOptions = new PanelOptions(this);
-		pResult = new PanelResult(this);
+		pResult = new PanelResult();
 		pTable = new PanelTable(this,data);
 		container = new JPanel(new GridLayout(1,2));
 		JPanel aux = new JPanel(new GridLayout(2,1));
@@ -125,6 +129,13 @@ public class MainWindow extends JFrame {
 		setVisible(true);
 	}
 	
+	public void calculate() {
+		pResult.setData(model.calculate());
+		pResult.init();
+//		pResult.revalidate();
+//		pResult.repaint();
+	}
+	
 	public String[] askInitialEntries() throws NullPointerException {
 		String Q = JOptionPane.showInputDialog(this, "Ingrese los estados Q separados por espacios: ", "Ejemplo: A B C D", JOptionPane.QUESTION_MESSAGE).toString().trim();
 		String S = JOptionPane.showInputDialog(this, "Ingrese el alfabeto finito de entrada S: ", "Ejemplo: 0 1 2 3", JOptionPane.QUESTION_MESSAGE).toString().trim();
@@ -151,10 +162,6 @@ public class MainWindow extends JFrame {
 		pTable.restartTable();
 		if (option)
 			pTable.clearPanel();
-	}
-	
-	public String[][] calculate() {
-		return model.calculate();
 	}
 
 	private void setup() {

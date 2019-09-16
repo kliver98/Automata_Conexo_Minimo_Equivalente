@@ -7,7 +7,7 @@ public class Automata {
 	
 	private HashMap<String,String[]> data;
 	private HashMap<String,String> statesMealy;
-	private ArrayList<String> entryAlphabet;
+	private HashSet<Character> entryAlphabet;
 	private HashSet<String> outputAlphabet;
 	private Integer numberOfColumns;
 	/**
@@ -23,7 +23,7 @@ public class Automata {
 		this.automataType = automataType;
 		data = new HashMap<String,String[]>();
 		statesMealy = new HashMap<String,String>();
-		entryAlphabet = new ArrayList<String>();
+		entryAlphabet = new HashSet<Character>();
 		outputAlphabet = new HashSet<String>();
 //		chargeTest();
 	}
@@ -31,8 +31,8 @@ public class Automata {
 	public String[][] getInitialTable() {
 		String[][] rst = new String[data.keySet().size()+1][numberOfColumns+1];
 		int i = 0;
-		for (String c : entryAlphabet) {
-			rst[0][i+1] = c;
+		for (Character c : entryAlphabet) {
+			rst[0][i+1] = c+"";
 			i++;
 		}
 		i = 0;
@@ -96,7 +96,10 @@ public class Automata {
 			t.add(s);
 		}
 		return stepThree(stepTwo(t));*/
-		return stepThree(stepTwo(stepOne()));
+		HashSet<String> a = stepOne();
+		ArrayList<ArrayList<String>> b = stepTwo(a);
+		String[][] c = stepThree(b);
+		return c;
 	}
 	
 	public Boolean setInitialData(String[] initialData) {
@@ -114,7 +117,7 @@ public class Automata {
 		for (String aux: S) {
 			if (aux.length()>1)
 				return false;
-			entryAlphabet.add(aux);
+			entryAlphabet.add(aux.charAt(0));
 		}
 		
 		for (String aux : R) {
@@ -165,6 +168,7 @@ public class Automata {
 			return visited;
 		visited.add(add);
 		for (String v : data.get(add)) {
+			v = v.split("\r")[0];
 			if (!automataType && outputAlphabet.contains(v))
 				break;
 			auxStepOne(visited, automataType ? v.substring(0, v.length()-1):v);
@@ -227,9 +231,12 @@ public class Automata {
 		for (String actual : cEq) {
 			String[] b = data.get(actual);
 			String key = !automataType ? data.get(actual)[data.get(actual).length-1]:"";
+			key = key.split("\r")[0];
 			if (automataType) {
-				for (String a : b)
+				for (String a : b) {
+					a = a.split("\r")[0];
 					key += a.charAt(a.length()-1);
+				}
 			}
 			HashSet<String> tmp = aux.getOrDefault(key, new HashSet<String>());
 			if (!tmp.contains(actual))
@@ -250,6 +257,7 @@ public class Automata {
 	private ArrayList<String> findStatesAchievable(String tmp) {
 		ArrayList<String> rst = new ArrayList<String>();
 		for (String a : data.get(tmp)) {
+			a =  a.split("\r")[0];
 			if (!automataType && outputAlphabet.contains(a))
 				break;
 			rst.add(automataType ? a.substring(0, a.length()-1):a);
@@ -357,7 +365,7 @@ public class Automata {
 		String[][] rst = new String[stepTwo.size()+1][numberOfColumns+1];
 		rst[0][0] = "   ";
 		int a = 1;
-		for (String c : entryAlphabet) {
+		for (Character c : entryAlphabet) {
 			rst[0][a] = c+"";
 			a++;
 		}
@@ -371,10 +379,11 @@ public class Automata {
 			String test = stepTwo.get(i).get(0);
 			for (int j = 0; j < entryAlphabet.size(); j++) {
 				String cell = data.get(test)[j];
+				cell = cell.split("\r")[0];
 				String qn = "q"+(findQn(stepTwo, automataType ? cell.substring(0,cell.length()-1):cell)+1);
 				qn = automataType ? qn+"/"+cell.substring(cell.length()-1):qn;
 				rst[i+1][j+1] = qn;
-				helpful.add(data.get(test)[numberOfColumns-1]);
+				helpful.add(data.get(test)[numberOfColumns-1].split("\r")[0]);
 			}
 			a++;
 		}

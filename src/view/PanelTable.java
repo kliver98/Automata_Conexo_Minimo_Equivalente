@@ -87,18 +87,17 @@ public class PanelTable extends JPanel {
 				matrix[i][j] = tmp;
 				if (i==0 && j>0) {
 					matrix[i][j].setText(data[i][j]);
-					matrix[i][j].setEditable(false);
 					tmp.setBackground(Color.WHITE);
 					tmp.setForeground(Color.BLACK);
 				}else if (i>0 && j==0) {
 					matrix[i][j].setText(data[i][j]);
-					matrix[i][j].setEditable(false);
 					tmp.setBackground(Color.BLACK);
 					tmp.setForeground(Color.WHITE);
 				} else {
 					tmp.setBackground(new Color(218, 222, 230));
 					matrix[i][j].setText(data[i][j]);
 				}
+				matrix[i][j].setEditable(false);
 			}
 		}
 		matrix[0][0].setEditable(false);

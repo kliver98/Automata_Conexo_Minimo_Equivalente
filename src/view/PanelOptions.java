@@ -120,7 +120,7 @@ public class PanelOptions extends JPanel implements ActionListener {
 				main.init();
 				break;
 			case SOLVE:
-				
+				main.calculate();
 				break;
 			case ADD_DATA:
 				boolean success = main.addRowData(jtPane.getText().split("\n"));
