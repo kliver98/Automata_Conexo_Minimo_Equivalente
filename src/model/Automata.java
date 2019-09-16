@@ -7,7 +7,7 @@ public class Automata {
 	
 	private HashMap<String,String[]> data;
 	private HashMap<String,String> statesMealy;
-	private HashSet<Character> entryAlphabet;
+	private ArrayList<String> entryAlphabet;
 	private HashSet<String> outputAlphabet;
 	private Integer numberOfColumns;
 	/**
@@ -23,12 +23,38 @@ public class Automata {
 		this.automataType = automataType;
 		data = new HashMap<String,String[]>();
 		statesMealy = new HashMap<String,String>();
-		entryAlphabet = new HashSet<Character>();
+		entryAlphabet = new ArrayList<String>();
 		outputAlphabet = new HashSet<String>();
+//		chargeTest();
+	}
+	
+	public String[][] getInitialTable() {
+		String[][] rst = new String[data.keySet().size()+1][numberOfColumns+1];
+		int i = 0;
+		for (String c : entryAlphabet) {
+			rst[0][i+1] = c;
+			i++;
+		}
+		i = 0;
+		for (String out : data.keySet()) {
+			rst[i+1][0] = out;
+			i++;
+		}
+		i = 1;
+		for (String key : data.keySet()) {
+			if (data.get(key)==null)
+				data.put(key, new String[numberOfColumns]);
+			for (int j = 0; j < data.get(key).length; j++) {
+				rst[i][j+1] = data.get(key)[j];
+			}
+			i++;
+		}
+		return rst;
 	}
 	
 	public void chargeTest() {
-		setInitialData(new String[] {"A B C D E","a b","0 1","A"});
+		setInitialData(new String[] {"A B C D E F G H","a b","0 1","A"}); //Works with states put, if there is more than table doesn't mine but not otherwise
+		//For Mealy
 		automataType = true;
 		numberOfColumns = automataType ? 2:3;
 		addRowData(new String[] {
@@ -38,25 +64,39 @@ public class Automata {
 				"D D0 E1",
 				"E D0 D0"
 		});
+		//For Moore
 //		automataType = false;
 //		numberOfColumns = automataType ? 2:3;
-//		boolean t = addRowData(new String[] {
-//				"A A B 0",
+//		addRowData(new String[] {
+//				/*"A A B 0",
 //				"B C B 1",
 //				"C B D 0",
 //				"D E D 0",
-//				"E E A 0"/*
+//				"E E A 0"*/
 //				"A B C 0",
 //				"B B D 1",
 //				"C B E 1",
 //				"D B E 1",
-//				"E E E 0"*/
+//				"E E E 0"/*
+//				"A D C 0",
+//				"B F H 0",
+//				"C E D 1",
+//				"D A E 0",
+//				"E C A 1",
+//				"F F B 1",
+//				"G B H 0",
+//				"H C G 1"*/
 //		});
-		HashSet<String> a = stepOne();
-		ArrayList<ArrayList<String>> b = stepTwo(a);
-		printTwo(b);
-		stepThree(b);
-		
+	}
+	
+	public String[][] calculate() {
+		/* If you want to use the algorithm without step one, just uncomment this part and comment the return enable
+		HashSet<String> t = new HashSet<String>();
+		for (String s : data.keySet()) {
+			t.add(s);
+		}
+		return stepThree(stepTwo(t));*/
+		return stepThree(stepTwo(stepOne()));
 	}
 	
 	public Boolean setInitialData(String[] initialData) {
@@ -74,7 +114,7 @@ public class Automata {
 		for (String aux: S) {
 			if (aux.length()>1)
 				return false;
-			entryAlphabet.add(aux.toCharArray()[0]);
+			entryAlphabet.add(aux);
 		}
 		
 		for (String aux : R) {
@@ -98,14 +138,18 @@ public class Automata {
 	}
 	
 	public Boolean addRowData(String[] add) {
+		if (add.length<1)
+			return false;
 		if (automataType) {			
 			for (String s : add) {
+				if (s.length()<1)
+					return false;
 				statesMealy.put(s.substring(0,s.length()-1),s.substring(s.length()-1));
 			}
 		}
 		for (String aux: add) {
 			String tmp[] = aux.split(" ");
-			if (tmp.length!=(numberOfColumns+1) || !data.containsKey(tmp[0]) || data.getOrDefault(tmp[0], null)!=null)
+			if (tmp.length!=(numberOfColumns+1) || !data.containsKey(tmp[0]))
 				return false;
 			String rowAdd[] = new String[numberOfColumns];
 			for (int i = 1; i < tmp.length; i++)
@@ -130,8 +174,8 @@ public class Automata {
 	}
 	
 	public HashSet<String> stepOne() {
-	
-		return auxStepOne(new HashSet<String>(),q1);
+		HashSet<String> t = auxStepOne(new HashSet<String>(),q1);
+		return t;
 		
 	}
 	
@@ -166,23 +210,9 @@ public class Automata {
 //		
 //	}
 	
-	public void printTwo(ArrayList<ArrayList<String>> rst) {
-		int i = 1;
-		for (ArrayList<String> a : rst) {
-			System.out.print("B"+i+" = { ");
-			for (String s : a) {
-				System.out.print(s+" ");
-			}
-			System.out.print("}\n");
-			i++;
-		}
-		System.out.println("--------------");
-	}
-	
 	public ArrayList<ArrayList<String>> stepTwo(HashSet<String> cEq) {
 		
 		ArrayList<ArrayList<String>> rst = stepTwoA(cEq);
-		printTwo(rst);
 		rst = stepTwoB(rst);
 		
 		return rst;
@@ -251,6 +281,16 @@ public class Automata {
 		return true;
 	}
 	
+//	private void print(ArrayList<ArrayList<String>> a) {
+//		System.out.println("-------");
+//		for (int i = 0; i < a.size(); i++) {
+//			for (int j = 0; j < a.get(i).size(); j++) {
+//				System.out.print(a.get(i).get(j)+" ");
+//			}
+//			System.out.println();
+//		}
+//	}
+	
 	private ArrayList<ArrayList<String>> stepTwoB(ArrayList<ArrayList<String>> parts) {
 		
 		ArrayList<ArrayList<String>> rst = new ArrayList<ArrayList<String>>();
@@ -272,8 +312,8 @@ public class Automata {
 				rst.add(aux2);
 		}
 		
+//		print(parts); Prints each partition
 		while (!stepTwoC(parts,rst)) {
-			printTwo(rst);
 			parts = rst;
 			rst = stepTwoB(rst);
 		}
@@ -313,12 +353,11 @@ public class Automata {
 	}
 	
 	private String[][] stepThree(ArrayList<ArrayList<String>> stepTwo) {
-		System.out.println("Last Step");
 		HashMap<String,HashSet<String>> veryHelpful = new HashMap<String,HashSet<String>>();
 		String[][] rst = new String[stepTwo.size()+1][numberOfColumns+1];
 		rst[0][0] = "   ";
 		int a = 1;
-		for (Character c : entryAlphabet) {
+		for (String c : entryAlphabet) {
 			rst[0][a] = c+"";
 			a++;
 		}
@@ -335,35 +374,15 @@ public class Automata {
 				String qn = "q"+(findQn(stepTwo, automataType ? cell.substring(0,cell.length()-1):cell)+1);
 				qn = automataType ? qn+"/"+cell.substring(cell.length()-1):qn;
 				rst[i+1][j+1] = qn;
-				helpful.add(data.get(test)[j]);
+				helpful.add(data.get(test)[numberOfColumns-1]);
 			}
 			a++;
 		}
 		if (!automataType) {
-			for (int i = 0; i < veryHelpful.keySet().size(); i++) {
-				String n = "";
+			for (int i = 0; i < veryHelpful.keySet().size(); i++) { //Cada fila
 				String key = (String) veryHelpful.keySet().toArray()[i];
-				HashSet<String> vhValues = veryHelpful.get(key);
-				for (String k : data.keySet()) {
-					HashSet<String> vhValues2 = new HashSet<String>();
-					for (int j = 1; j < data.get(k).length-1; j++) {
-						vhValues2.add(data.get(k)[j]);
-					}
-					for (String s : vhValues) {
-						if (vhValues2.contains(s)) {
-							n = data.get(k)[numberOfColumns-1];
-							break;
-						}
-					}
-				}
-				rst[i+1][numberOfColumns] = n;
+				rst[i+1][numberOfColumns] = veryHelpful.get(key).toArray()[0].toString();
 			}
-		}
-		for (int i = 0; i < rst.length; i++) {
-			for (int j = 0; j < rst[i].length; j++) {
-				System.out.print(rst[i][j]+" ");
-			}
-			System.out.println();
 		}
 		return rst;
 	}

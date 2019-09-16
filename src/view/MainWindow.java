@@ -52,16 +52,16 @@ public class MainWindow extends JFrame {
 	
 	//Methods
 	public MainWindow() {
-		model = new Automata(true);	//Prueba
-		model.chargeTest();			//Prueba
-//		setup();
-//		init();
+//		model = new Automata(true);	//Test
+//		model.chargeTest();			//Test
+		setup();
+		init();
 	}
 	
-	private void addPanels() {
+	private void addPanels(String[][] data) {
 		pOptions = new PanelOptions(this);
 		pResult = new PanelResult(this);
-		pTable = new PanelTable(this);
+		pTable = new PanelTable(this,data);
 		container = new JPanel(new GridLayout(1,2));
 		JPanel aux = new JPanel(new GridLayout(2,1));
 		aux.add(pTable);
@@ -83,31 +83,45 @@ public class MainWindow extends JFrame {
 		System.exit(0);
 	}
 	
+	public Boolean addRowData(String[] add) {
+		boolean result = model.addRowData(add);
+		if (result) {
+			clearTable(true);
+			pTable.setData(model.getInitialTable());
+			pTable.init();
+			this.revalidate();
+			this.repaint();
+		}
+		return result;
+	}
+	
 	public void init() {
 		setVisible(false);
-		model = new Automata(true);	//Prueba
-		model.chargeTest();			//Prueba
-//		int typeAutomata = askTypeAutomata(); // 0 to Mealy - 1 to Moore
-//		if (typeAutomata==JOptionPane.CLOSED_OPTION || (typeAutomata==2 && model==null))
-//			closeApp();
-//		else if (typeAutomata==2) {
-//			setVisible(true);
-//			return;
-//		}
-//		model = new Automata(typeAutomata==0);
-//		boolean aceptado = false;
-//		while (!aceptado) {
-//			String[] initialData = null;
-//			try {			
-//				initialData = askInitialEntries();
-//			} catch (NullPointerException ex) {
-//				closeApp();
-//			}
-//			aceptado = model.setInitialData(initialData);
-//			if (!aceptado)
-//				JOptionPane.showMessageDialog(null, "Se detecto un error con las entradas","Vuelva a intentarlo", JOptionPane.ERROR_MESSAGE);
-//		}
-		addPanels();
+		//If you want run Test, comment this part
+		int typeAutomata = askTypeAutomata(); // 0 to Mealy - 1 to Moore
+		if (typeAutomata==JOptionPane.CLOSED_OPTION || (typeAutomata==2 && model==null))
+			closeApp();
+		else if (typeAutomata==2) {
+			setVisible(true);
+			return;
+		}
+		if (pTable!=null)
+			clearTable(true);
+		model = new Automata(typeAutomata==0);
+		boolean aceptado = false;
+		while (!aceptado) {
+			String[] initialData = null;
+			try {			
+				initialData = askInitialEntries();
+			} catch (NullPointerException ex) {
+				closeApp();
+			}
+			aceptado = model.setInitialData(initialData);
+			if (!aceptado)
+				JOptionPane.showMessageDialog(null, "Se detecto un error con las entradas","Vuelva a intentarlo", JOptionPane.ERROR_MESSAGE);
+		}
+		//'Till here
+		addPanels(model.getInitialTable());
 		setVisible(true);
 	}
 	
@@ -131,6 +145,16 @@ public class MainWindow extends JFrame {
 	 */
 	public Boolean getAutomataType() {
 		return model.getAutomataType();
+	}
+	
+	public void clearTable(boolean option) {
+		pTable.restartTable();
+		if (option)
+			pTable.clearPanel();
+	}
+	
+	public String[][] calculate() {
+		return model.calculate();
 	}
 
 	private void setup() {

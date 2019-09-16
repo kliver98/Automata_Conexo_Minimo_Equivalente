@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -113,11 +114,18 @@ public class PanelOptions extends JPanel implements ActionListener {
 				break;
 			case DELETE_TABLE:
 				jtPane.setText("");
+				main.clearTable(false);
 				break;
 			case CHANGE_TYPE:
 				main.init();
 				break;
 			case SOLVE:
+				
+				break;
+			case ADD_DATA:
+				boolean success = main.addRowData(jtPane.getText().split("\n"));
+				if (!success)
+					JOptionPane.showMessageDialog(null, "Revisa tu entrada!", "Error", JOptionPane.ERROR_MESSAGE);
 				break;
 		}
 	}
