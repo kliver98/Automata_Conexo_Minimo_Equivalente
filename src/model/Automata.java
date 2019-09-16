@@ -5,10 +5,25 @@ import java.util.HashMap;
 import java.util.HashSet;
 public class Automata {
 	
+	/**
+	 * Attribute to store data of the automata, basically the matrix
+	 */
 	private HashMap<String,String[]> data;
+	/**
+	 * Attribute to store the outputs that a row has to have in a Mealy machine
+	 */
 	private HashMap<String,String> statesMealy;
+	/**
+	 * Attribute to store the entry alphabet of the machine working on
+	 */
 	private HashSet<Character> entryAlphabet;
+	/**
+	 * Attribute to store the output alphabet of the machine working on
+	 */
 	private HashSet<String> outputAlphabet;
+	/**
+	 * Attribute to know the number of columns in the matrix withou counting the column for states
+	 */
 	private Integer numberOfColumns;
 	/**
 	 * Attribute to know type of table, True for Mealy and False for Moore
@@ -19,15 +34,23 @@ public class Automata {
 	 */
 	private String q1;
 	
+	/**
+	 * Builder
+	 * @param automataType - to know type of table working on, True for Mealy and False for Moore
+	 */
 	public Automata(Boolean automataType) {
 		this.automataType = automataType;
 		data = new HashMap<String,String[]>();
 		statesMealy = new HashMap<String,String>();
 		entryAlphabet = new HashSet<Character>();
 		outputAlphabet = new HashSet<String>();
-//		chargeTest();
+//		chargeTest(); it doesn't work just uncommenting this line
 	}
 	
+	/**
+	 * Method to get a string matrix that represents the values of each cell in the table to show
+	 * @return the String matrix with their cell values
+	 */
 	public String[][] getInitialTable() {
 		String[][] rst = new String[data.keySet().size()+1][numberOfColumns+1];
 		int i = 0;
@@ -52,6 +75,9 @@ public class Automata {
 		return rst;
 	}
 	
+	/**
+	 * Method to test the program during implementation
+	 */
 	public void chargeTest() {
 		setInitialData(new String[] {"A B C D E F G H","a b","0 1","A"}); //Works with states put, if there is more than table doesn't mine but not otherwise
 		//For Mealy
@@ -89,6 +115,10 @@ public class Automata {
 //		});
 	}
 	
+	/**
+	 * Method to calculate the conex and minimum equivalent automata introduce before
+	 * @return a string matrix with the answer
+	 */
 	public String[][] calculate() {
 		/* If you want to use the algorithm without step one, just uncomment this part and comment the return enable
 		HashSet<String> t = new HashSet<String>();
@@ -102,6 +132,11 @@ public class Automata {
 		return c;
 	}
 	
+	/**
+	 * Method to setup the values of Q,S,R and q1 of the mahcine
+	 * @param initialData with the values to store, each row represents Q,S,R,q1 respectively
+	 * @return a boolean if everything goes fine
+	 */
 	public Boolean setInitialData(String[] initialData) {
 		
 		if (initialData[0].length()<1 || initialData[1].length()<1 || initialData[2].length()<1 || initialData[3].length()<1)
@@ -140,6 +175,11 @@ public class Automata {
 		
 	}
 	
+	/**
+	 * Method to add the information of a row or rows, the state with their transition (Where it moves with some entry)
+	 * @param add with the cell information
+	 * @return a boolean if everything goes fine
+	 */
 	public Boolean addRowData(String[] add) {
 		if (add.length<1)
 			return false;
@@ -162,6 +202,12 @@ public class Automata {
 		return true;
 	}
 	
+	/**
+	 * A recursive method that get out the accessible states from a given
+	 * @param visited that help to store the states visited
+	 * @param add with the state to add
+	 * @return a hashSet collection that has all the states accessible from add
+	 */
 	private HashSet<String> auxStepOne(HashSet<String> visited,String add) {
 		
 		if (visited.contains(add))
@@ -177,6 +223,10 @@ public class Automata {
 		
 	}
 	
+	/**
+	 * Method public for call stepOne, get the accessible nodes from initial state
+	 * @return hashSet wich has all the states accessible from initial state
+	 */
 	public HashSet<String> stepOne() {
 		HashSet<String> t = auxStepOne(new HashSet<String>(),q1);
 		return t;
@@ -214,6 +264,11 @@ public class Automata {
 //		
 //	}
 	
+	/**
+	 * Method for step Two, get out the final partition 
+	 * @param cEq with all the states it must to work
+	 * @return a list of list that has the blocks of final partition
+	 */
 	public ArrayList<ArrayList<String>> stepTwo(HashSet<String> cEq) {
 		
 		ArrayList<ArrayList<String>> rst = stepTwoA(cEq);
@@ -223,6 +278,11 @@ public class Automata {
 		
 	}
 	
+	/**
+	 * Method for step To One, gets the start partition
+	 * @param cEq with all states it has to work
+	 * @return a list of list that has the blocks of first partition
+	 */
 	private ArrayList<ArrayList<String>> stepTwoA(HashSet<String> cEq) {
 		
 		ArrayList<ArrayList<String>> rst = new ArrayList<ArrayList<String>>();
@@ -254,6 +314,11 @@ public class Automata {
 		
 	}
 	
+	/**
+	 * Method to find the states achievable from a state
+	 * @param tmp the state to know their accessible states
+	 * @return a list with their accessible nodes 
+	 */
 	private ArrayList<String> findStatesAchievable(String tmp) {
 		ArrayList<String> rst = new ArrayList<String>();
 		for (String a : data.get(tmp)) {
@@ -265,6 +330,12 @@ public class Automata {
 		return rst;
 	}
 
+	/**
+	 * Method to find the first achievable states from a given state
+	 * @param arr with the partition to search
+	 * @param tmp the state to find
+	 * @return a block where the state tmp is
+	 */
 	private ArrayList<String> findStatesFirstAchievable(ArrayList<ArrayList<String>> arr, String tmp) {
 		for (ArrayList<String> a : arr) {
 			for (String s : a) {
@@ -275,6 +346,13 @@ public class Automata {
 		return null;
 	}
 	
+	/**
+	 * Method to know if to states belongs to same block of a partition
+	 * @param arr with the partition to search
+	 * @param tmp with the name of state one
+	 * @param tmp2 with the name of state two
+	 * @return
+	 */
 	private Boolean isPartOfSameBlock(ArrayList<ArrayList<String>> arr, String tmp, String tmp2) {
 		ArrayList<String> auxTmp = findStatesAchievable(tmp);
 		ArrayList<String> auxTmp2 = findStatesAchievable(tmp2);
@@ -299,6 +377,11 @@ public class Automata {
 //		}
 //	}
 	
+	/**
+	 * Method for step Two B that help to get next partition of a given
+	 * @param parts that represents the partition that has to be partitioned again
+	 * @return the final partition equivalent
+	 */
 	private ArrayList<ArrayList<String>> stepTwoB(ArrayList<ArrayList<String>> parts) {
 		
 		ArrayList<ArrayList<String>> rst = new ArrayList<ArrayList<String>>();
@@ -330,6 +413,12 @@ public class Automata {
 		
 	}
 	
+	/**
+	 * Method to check if to partitions are equal
+	 * @param pm with one partition
+	 * @param pm1 with another partition
+	 * @return true if there equal, false otherwise
+	 */
 	private Boolean stepTwoC(ArrayList<ArrayList<String>> pm,ArrayList<ArrayList<String>> pm1) {
 		
 		if (pm.size()!=pm1.size())
@@ -348,6 +437,12 @@ public class Automata {
 		
 	}
 	
+	/**
+	 * Method to find the index of a state in a partition
+	 * @param stepTwo it's the partition where to search
+	 * @param find it's the state to find
+	 * @return the index where was found the state in the partition
+	 */
 	private int findQn(ArrayList<ArrayList<String>> stepTwo, String find) {
 		int i = -1;
 		for (ArrayList<String> arr : stepTwo) {
@@ -360,6 +455,11 @@ public class Automata {
 		return i+1;
 	}
 	
+	/**
+	 * Method to do final step, step three to get the minimum equivalent
+	 * @param stepTwo with the final partition produced by step Two
+	 * @return a string matrix with their cells meaning the information of calculus computed
+	 */
 	private String[][] stepThree(ArrayList<ArrayList<String>> stepTwo) {
 		HashMap<String,HashSet<String>> veryHelpful = new HashMap<String,HashSet<String>>();
 		String[][] rst = new String[stepTwo.size()+1][numberOfColumns+1];
